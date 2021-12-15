@@ -1,4 +1,20 @@
+// Project Type
+enum ProjectStatus {
+	Active,
+	Finished,
+}
+class Project {
+	constructor(
+		public id: string,
+		public title: string,
+		public description: string,
+		public people: number,
+		public status: ProjectStatus
+	) {}
+}
+
 // Project State Management
+type Listener = (items: Project[]) => void;
 class ProjectState {
 	private listeners: Listener[] = [];
 	private projects: Project[] = [];
@@ -16,7 +32,7 @@ class ProjectState {
 		return this.instance;
 	}
 
-	addListener(listenerFn: ListenerFn) {
+	addListener(listenerFn: Listener) {
 		this.listeners.push(listenerFn);
 	}
 
@@ -25,7 +41,8 @@ class ProjectState {
 			Math.random().toString(),
 			title,
 			description,
-			numOfPeople
+			numOfPeople,
+			ProjectStatus.Active
 		);
 		this.projects.push(newProject);
 		for (const listenerFn of this.listeners) {
@@ -100,25 +117,6 @@ function autobind(
 	return adjDescriptor;
 }
 
-// Project class
-class Project {
-	constructor(
-		public id: string,
-		public title: string,
-		public description: string,
-		public numOfPeople: number
-	) {}
-}
-
-// Listener Types
-interface Listener {
-	(projects: Project[]): void;
-}
-
-interface ListenerFn {
-	(...args: any[]): void;
-}
-
 // ProjectList Class
 class ProjectList {
 	templateElement: HTMLTemplateElement;
@@ -152,7 +150,7 @@ class ProjectList {
 		const listEl = document.getElementById(
 			`${this.type}-projects-list`
 		)! as HTMLUListElement;
-		//listEl.innerHTML = "";
+		listEl.innerHTML = "";
 		for (const prjItem of this.assignedProjects) {
 			const listItem = document.createElement("li");
 			listItem.textContent = prjItem.title;
@@ -173,7 +171,6 @@ class ProjectList {
 }
 
 // ProjectItem Class
-
 class ProjectItem {}
 
 // ProjectInput Class
